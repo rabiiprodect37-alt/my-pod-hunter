@@ -1,4 +1,3 @@
-
 import streamlit as st
 import requests
 import urllib.parse
@@ -36,11 +35,10 @@ if st.button("Generate⚡"):
         if not model_path:
             st.error("❌ API Key error. Check it in AI Studio.")
         else:
-            # Kan-sta3mlo l-model li l9ina (ghaliban flash)
             api_url = f"https://generativelanguage.googleapis.com/v1beta/{model_path}:generateContent?key={user_api_key}"
             
-            # PROMPT MJHD: Kan-charfo 3la Gemini y-3tina format nqi
-            prompt_instr = f"POD Expert: Create 1 short quote and 1 image prompt for niche '{niche}'. Format exactly like this: Quote: [text] | Prompt: [text]. Do not add any other text."
+            # Prompt m7ded bach Gemini may-kherbech l-format
+            prompt_instr = f"Act as a POD expert. Give me 1 quote and 1 image prompt for niche '{niche}'. Format exactly like this: Quote: [text] | Prompt: [text]. Do not add any extra text or new lines."
             
             with st.spinner("Generating design..."):
                 try:
@@ -48,12 +46,13 @@ if st.button("Generate⚡"):
                     output = res.json()['candidates'][0]['content']['parts'][0]['text']
                     
                     if "|" in output:
-                        quote = output.split("|")[0].replace("Quote:", "").strip()
-                        p_text = output.split("|")[1].replace("Prompt:", "").strip()
+                        parts = output.split("|")
+                        quote = parts[0].replace("Quote:", "").strip()
+                        p_text = parts[1].replace("Prompt:", "").strip()
                         
-                        # --- CLEANING L-PROMPT ---
-                        # Bach n-t-fadao ay ktaba zayda kat-khsser l-lien
-                        clean_p = p_text.replace("\n", " ").strip()
+                        # --- CLEANING L-PROMPT (MOUHIM BZZAF) ---
+                        # Had s-stora kiy-ms7o ay ktaba zayda li kat-khsser t-swira
+                        clean_p = p_text.replace("\n", " ").replace("\r", " ").strip()
                         
                         # --- GENERATION DYAL T-SWIRA ---
                         encoded = urllib.parse.quote(clean_p)
@@ -62,8 +61,8 @@ if st.button("Generate⚡"):
                         st.markdown("---")
                         col1, col2 = st.columns([1, 1])
                         with col1:
-                            # Hna fin t-swira ghadi t-ban darouri
-                            st.image(image_url, use_container_width=True)
+                            # Hna fin ghadi t-ban t-swira
+                            st.image(image_url, caption=f"Design: {niche}", use_container_width=True)
                         with col2:
                             st.success(f"**Quote:** {quote}")
                             st.info("**AI Image Prompt:**")
@@ -75,4 +74,4 @@ if st.button("Generate⚡"):
                     st.error(f"Error: {str(e)}")
 
 st.markdown("---")
-st.caption("POD Tool - Professional Edition")
+st.caption("POD Tool - Version Stable")
