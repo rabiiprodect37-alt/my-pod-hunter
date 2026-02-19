@@ -9,10 +9,26 @@ st.title("🚀 POD Niche Hunter Pro")
 # --- SIDEBAR (Settings) ---
 with st.sidebar:
     st.header("Settings")
-    api_key = st.text_input("Gemini API Key", type="password")
+    api_key = st.text_input("AIzaSyD29Q6dYX8D6Ho5iy4Ke-a0Lg6XK0_4gHA", type="password")
     style_choice = st.selectbox("Style", [
         "Vintage Retro Sunset", "Kawaii Cute", "Dark Grunge", "Neon Cyberpunk", "Watercolor"
     ])
+
+# --- FUNCTION TO FIND WORKING MODEL ---
+def get_working_model(key):
+    # Jarreb v1beta hit fiha les models l-jdad
+    url = f"https://generativelanguage.googleapis.com/v1beta/models?key={key}"
+    try:
+        res = requests.get(url)
+        if res.status_code == 200:
+            models = res.json().get('models', [])
+            # N9llbo 3la gemini-1.5-flash awla gemini-pro
+            for m in models:
+                if "generateContent" in m['supportedGenerationMethods']:
+                    return m['name'] # Kay-rjje3 'models/gemini-1.5-flash' mtlm
+    except:
+        pass
+    return "models/gemini-pro" # Backup
 
 # --- MAIN INTERFACE ---
 niche_input = st.text_area("Entrez vos niches (Ex: Cat Mom, Fishing):")
@@ -23,18 +39,15 @@ if st.button("Generate Designs ⚡"):
     elif not niche_input:
         st.warning("⚠️ Ktb chi niche.")
     else:
-        # Hada howa l-URL l-khddam 100% (v1 machi v1beta bach t-fada l-machakil)
-        url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={api_key}"
+        # 1. N-detectiw l-model l-khddam
+        working_model = get_working_model(api_key)
+        url = f"https://generativelanguage.googleapis.com/v1beta/{working_model}:generateContent?key={api_key}"
         
         niches = [n.strip() for n in niche_input.split(",") if n.strip()]
         for niche in niches:
-            with st.spinner(f"🕵️‍♂️ Génération pour: {niche}..."):
+            with st.spinner(f"🕵️‍♂️ Génération avec {working_model}..."):
                 payload = {
-                    "contents": [{
-                        "parts": [{
-                            "text": f"Act as a POD expert. Niche: '{niche}', Style: '{style_choice}'. Provide: 1 catchy Quote and 1 Detailed AI Image Prompt. Format: Quote: [text] | Prompt: [text]"
-                        }]
-                    }]
+                    "contents": [{"parts": [{"text": f"Act as a POD expert. Niche: '{niche}', Style: '{style_choice}'. Provide: 1 catchy Quote and 1 Detailed AI Image Prompt. Format: Quote: [text] | Prompt: [text]"}]}]
                 }
                 
                 try:
@@ -47,7 +60,6 @@ if st.button("Generate Designs ⚡"):
                             quote = text_response.split("|")[0].replace("Quote:", "").strip()
                             img_prompt = text_response.split("|")[1].replace("Prompt:", "").strip()
                             
-                            # Generation d'image
                             encoded = urllib.parse.quote(img_prompt)
                             img_url = f"https://image.pollinations.ai/prompt/{encoded}?width=512&height=512&nologo=true"
                             
