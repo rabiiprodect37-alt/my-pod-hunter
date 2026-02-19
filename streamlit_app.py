@@ -11,7 +11,7 @@ st.write("Générer des designs en masse avec l'intelligence artificielle.")
 # --- SIDEBAR (Settings) ---
 with st.sidebar:
     st.header("Settings")
-    api_key = st.text_input("Gemini API Key", type="password")
+    api_key = st.text_input("AIzaSyD29Q6dYX8D6Ho5iy4Ke-a0Lg6XK0_4gHA", type="password")
     style_choice = st.selectbox("Style", [
         "Vintage Retro Sunset", 
         "Kawaii Cute", 
