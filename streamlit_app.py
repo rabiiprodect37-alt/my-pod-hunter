@@ -5,7 +5,7 @@ import re
 
 # --- UI SETTINGS ---
 st.set_page_config(page_title="POD Tool Pro", layout="wide")
-st.title("🎨 POD Designer Pro (Universal Fix)")
+st.title("🎨 POD Designer Pro (Final Image Fix)")
 
 # --- SIDEBAR ---
 with st.sidebar:
@@ -37,9 +37,10 @@ if st.button("Generate⚡"):
             st.error("❌ API Key error. Check it in AI Studio.")
         else:
             api_url = f"https://generativelanguage.googleapis.com/v1beta/{model_path}:generateContent?key={user_api_key}"
-            prompt_instr = f"Act as a POD expert. Give me 1 short quote and 1 detailed image prompt for niche '{niche}'. Format exactly: Quote: [text] | Prompt: [text]. No dots at the end."
+            # Prompt 9wi bach Gemini may-zidch l-kherbe9
+            prompt_instr = f"POD expert. Give 1 quote and 1 image prompt for niche '{niche}'. Format exactly: Quote: [text] | Prompt: [text]. No dots, no quotes."
             
-            with st.spinner("Generating..."):
+            with st.spinner("Generating Design..."):
                 try:
                     res = requests.post(api_url, json={"contents": [{"parts": [{"text": prompt_instr}]}]})
                     output = res.json()['candidates'][0]['content']['parts'][0]['text']
@@ -49,24 +50,28 @@ if st.button("Generate⚡"):
                         quote = parts[0].replace("Quote:", "").strip()
                         p_text = parts[1].replace("Prompt:", "").strip()
                         
-                        # --- CLEANING L-PROMPT (MOUHIM BZAFF) ---
-                        # Kan-7iydu ay 7aja mashi 7rouf awla ar9am bach l-lien may-t-khrbech
+                        # --- SUPER CLEANING (THE FIX) ---
+                        # Kan-khllio gher l-7rouf o l-ar9am o l-fara9at. 
+                        # Ay comma (,) awla dot (.) kat-ms7 bach l-lien y-koun n9i.
                         clean_p = re.sub(r'[^a-zA-Z0-9\s]', '', p_text).strip()
                         
-                        # URL dyal t-swira (Pollinations AI)
+                        # URL dyal t-swira
                         encoded = urllib.parse.quote(clean_p)
-                        image_url = f"https://image.pollinations.ai/prompt/{encoded}?width=1024&height=1024&nologo=true&seed=42"
+                        # Zdt seed random bach dima t-t-generi tswira jdida
+                        import random
+                        seed = random.randint(1, 1000)
+                        image_url = f"https://image.pollinations.ai/prompt/{encoded}?width=1024&height=1024&nologo=true&seed={seed}"
                         
                         st.markdown("---")
                         col1, col2 = st.columns([1, 1])
                         with col1:
-                            # Kan-st3mlu had l-format bach n-forcew t-swira t-ban
-                            st.image(image_url, use_container_width=True)
+                            # Forced Markdown Image
+                            st.markdown(f"![Design]({image_url})")
                         with col2:
                             st.success(f"**Quote:** {quote}")
                             st.info("**AI Image Prompt:**")
                             st.code(clean_p)
                     else:
-                        st.warning("Format error. Try again.")
+                        st.warning("Google format error. Try again.")
                 except Exception as e:
                     st.error(f"Error: {str(e)}")
