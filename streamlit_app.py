@@ -9,6 +9,7 @@ st.title("🎨 POD Designer Pro (Final Fix)")
 # --- SIDEBAR ---
 with st.sidebar:
     st.header("Setup")
+    # KHLLI HADA KIMA HOWA - MAT-BEDDELHCH B L-KEY DYALK HNA
     user_api_key = st.text_input("Gemini API Key", type="password")
 
 # --- AUTO-MODEL DISCOVERY ---
