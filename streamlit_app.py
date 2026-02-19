@@ -5,7 +5,7 @@ import re
 
 # --- UI SETTINGS ---
 st.set_page_config(page_title="POD Tool Pro", layout="wide")
-st.title("🎨 POD Designer Pro (Universal Fix)")
+st.title("🎨 POD Designer Pro (Force Image Fix)")
 
 # --- SIDEBAR ---
 with st.sidebar:
@@ -39,37 +39,37 @@ if st.button("Generate⚡"):
         else:
             api_url = f"https://generativelanguage.googleapis.com/v1beta/{model_path}:generateContent?key={user_api_key}"
             
-            # Instruction s3iba bach Gemini may-kherbech l-format
-            prompt_instr = f"Act as a POD expert. Give me 1 quote and 1 image prompt for niche '{niche}'. Format exactly like this: Quote: [text] | Prompt: [text]. Do not add any extra text, quotes, or new lines."
+            # Instruction sghira o m7deda bzaf
+            prompt_instr = f"Act as a POD expert. Give me 1 quote and 1 image prompt for niche '{niche}'. Format exactly: Quote: [text] | Prompt: [text]. No quotes, no extra words."
             
-            with st.spinner("Generating design..."):
+            with st.spinner("Generating..."):
                 try:
                     res = requests.post(api_url, json={"contents": [{"parts": [{"text": prompt_instr}]}]})
                     output = res.json()['candidates'][0]['content']['parts'][0]['text']
                     
                     if "|" in output:
                         parts = output.split("|")
-                        quote = parts[0].replace("Quote:", "").replace('"', '').strip()
-                        p_text = parts[1].replace("Prompt:", "").replace('"', '').replace('*', '').strip()
+                        quote = parts[0].replace("Quote:", "").strip()
+                        p_text = parts[1].replace("Prompt:", "").strip()
                         
-                        # --- SUPER CLEANING ---
-                        # Had s-ster kiy-7iyyed ay ktaba kat-khsser l-lien
-                        clean_p = re.sub(r'[^a-zA-Z0-9\s,.-]', '', p_text).replace("\n", " ").strip()
+                        # --- SUPER CLEANING (ALPHA VERSION) ---
+                        # Had s-ster kiy-khlli gher l-7rouf o l-ar9am
+                        clean_p = re.sub(r'[^a-zA-Z0-9\s]', '', p_text).strip()
                         
-                        # URL dyal t-swira
+                        # --- URL GENERATION ---
                         encoded = urllib.parse.quote(clean_p)
-                        image_url = f"https://image.pollinations.ai/prompt/{encoded}?width=800&height=800&nologo=true"
+                        image_url = f"https://image.pollinations.ai/prompt/{encoded}?width=1024&height=1024&nologo=true"
                         
                         st.markdown("---")
                         col1, col2 = st.columns([1, 1])
                         with col1:
-                            # Hna t-swira ghadi t-ban 100%
-                            st.image(image_url, caption=f"Design for {niche}", use_container_width=True)
+                            # Tariqa jdida dyal Markdown bach n-t-fadao broken images
+                            st.markdown(f"![Design]({image_url})")
                         with col2:
                             st.success(f"**Quote:** {quote}")
                             st.info("**AI Image Prompt:**")
                             st.code(clean_p)
                     else:
-                        st.warning("Google format error. Try again.")
+                        st.warning("Format error. Try again.")
                 except Exception as e:
                     st.error(f"Error: {str(e)}")
